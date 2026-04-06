@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mohammed Kehal | Ingénieur Informatique & Cybersécurité</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cyberBlack: '#050505',
+            lightCard: '#111111',
+            neonGreen: '#00FF41',
+            textPrimary: '#FFFFFF',
+            textSecondary: '#A0A0A0',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body { background-color: #050505; color: #A0A0A0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    h1, h2, h3 { color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.1em; }
+    .font-mono { font-family: 'Fira Code', monospace; color: #00FF41; }
+
+    /* Matrix Background */
+    #matrix-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.15; }
+
+    /* Animation des cartes */
+    .cyber-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .cyber-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 10px 30px -10px rgba(0, 255, 65, 0.3); border-color: #00FF41; }
+
+    /* Effet GLITCH sur le nom */
+    .glitch { position: relative; color: white; }
+    .glitch::before, .glitch::after {
+      content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: #050505;
+    }
+    .glitch::before { left: 2px; text-shadow: -2px 0 red; clip: rect(24px, 550px, 90px, 0); animation: glitch-anim-2 3s infinite linear alternate-reverse; }
+    .glitch::after { left: -2px; text-shadow: -2px 0 blue; clip: rect(85px, 550px, 140px, 0); animation: glitch-anim 2.5s infinite linear alternate-reverse; }
+    @keyframes glitch-anim { 0% { clip: rect(39px, 9999px, 71px, 0); } 20% { clip: rect(3px, 9999px, 5px, 0); } 40% { clip: rect(6px, 9999px, 38px, 0); } 60% { clip: rect(13px, 9999px, 43px, 0); } 80% { clip: rect(44px, 9999px, 93px, 0); } 100% { clip: rect(14px, 9999px, 89px, 0); } }
+    @keyframes glitch-anim-2 { 0% { clip: rect(65px, 9999px, 100px, 0); } 20% { clip: rect(3px, 9999px, 5px, 0); } 40% { clip: rect(14px, 9999px, 49px, 0); } 60% { clip: rect(28px, 9999px, 61px, 0); } 80% { clip: rect(9px, 9999px, 84px, 0); } 100% { clip: rect(53px, 9999px, 14px, 0); } }
+
+    /* Style de liste Cyber */
+    .cyber-list li { position: relative; padding-left: 1.5em; margin-bottom: 0.5rem; }
+    .cyber-list li::before { content: '>'; color: #00FF41; position: absolute; left: 0; font-family: 'Fira Code', monospace; font-weight: bold; }
+
+    /* Animation Multi-Page */
+    .page-section { display: none; opacity: 0; }
+    .page-section.active { display: block; animation: slideUpFade 0.6s ease-out forwards; }
+    @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- CSS POUR LE BILINGUISME --- */
+    html[lang="fr"] .lang-en { display: none !important; }
+    html[lang="en"] .lang-fr { display: none !important; }
+  </style>
+</head>
+<body class="antialiased selection:bg-neonGreen selection:text-cyberBlack">
+
+<canvas id="matrix-canvas"></canvas>
+
+<nav class="fixed w-full flex justify-between items-center p-4 md:px-8 backdrop-blur-xl bg-cyberBlack/80 z-50 border-b border-neonGreen/30 shadow-[0_0_15px_rgba(0,255,65,0.1)]">
+  <div class="text-neonGreen font-mono font-bold text-xl md:text-2xl tracking-widest"><i class="fa-solid fa-terminal mr-2"></i>&lt;MK/&gt;</div>
+
+  <div class="flex gap-4 md:gap-8 font-mono text-xs items-center">
+    <a href="javascript:void(0)" onclick="showPage('page-hero')" class="hover:text-neonGreen transition flex flex-col md:flex-row items-center gap-1 group">
+      <i class="fa-solid fa-house-chimney-user text-base group-hover:scale-110 transition"></i>
+      <span class="hidden md:inline lang-fr">ACCUEIL</span><span class="hidden md:inline lang-en">HOME</span>
+    </a>
+    <a href="javascript:void(0)" onclick="showPage('page-exp')" class="hover:text-neonGreen transition flex flex-col md:flex-row items-center gap-1 group">
+      <i class="fa-solid fa-briefcase text-base group-hover:scale-110 transition"></i>
+      <span class="hidden md:inline lang-fr">EXPÉRIENCE</span><span class="hidden md:inline lang-en">EXPERIENCE</span>
+    </a>
+    <a href="javascript:void(0)" onclick="showPage('page-projects')" class="hover:text-neonGreen transition flex flex-col md:flex-row items-center gap-1 group">
+      <i class="fa-solid fa-network-wired text-base group-hover:scale-110 transition"></i>
+      <span class="hidden md:inline lang-fr">RÉALISATIONS</span><span class="hidden md:inline lang-en">PROJECTS</span>
+    </a>
+    <a href="javascript:void(0)" onclick="showPage('page-skills')" class="hover:text-neonGreen transition flex flex-col md:flex-row items-center gap-1 group">
+      <i class="fa-solid fa-microchip text-base group-hover:scale-110 transition"></i>
+      <span class="hidden md:inline lang-fr">COMPÉTENCES</span><span class="hidden md:inline lang-en">SKILLS</span>
+    </a>
+    <a href="javascript:void(0)" onclick="showPage('page-contact')" class="px-3 py-1.5 md:py-2 md:px-4 border border-neonGreen text-neonGreen rounded hover:bg-neonGreen/20 transition flex items-center gap-2 group">
+      <i class="fa-regular fa-paper-plane group-hover:-translate-y-1 group-hover:translate-x-1 transition"></i>
+      <span class="hidden md:inline lang-fr">CONTACT</span><span class="hidden md:inline lang-en">CONTACT</span>
+    </a>
+    <button onclick="toggleLanguage()" class="ml-2 px-2 py-1 bg-neonGreen/10 border border-neonGreen text-neonGreen rounded hover:bg-neonGreen hover:text-cyberBlack transition cursor-pointer">
+      <span class="lang-fr font-bold">FR / <span class="font-normal opacity-50">EN</span></span>
+      <span class="lang-en font-bold"><span class="font-normal opacity-50">FR</span> / EN</span>
+    </button>
+  </div>
+</nav>
+
+<div id="page-content" class="pt-24 pb-10">
+
+  <div id="page-hero" class="page-section active">
+    <section class="min-h-[75vh] flex flex-col justify-center px-6 md:px-24 max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-8 mb-8">
+        <div class="w-24 md:w-32 flex-shrink-0 relative group">
+          <div class="absolute inset-0 border-2 border-neonGreen transform translate-x-2 translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-300"></div>
+          <div class="relative z-10 bg-cyberBlack w-full h-full aspect-square border border-neonGreen/50 p-1 flex items-center justify-center overflow-hidden">
+            <img src="Me1.jpeg" alt="Mohammed Kehal" class="w-full h-full object-cover" onerror="this.style.display='none'">
+          </div>
+        </div>
+        <div>
+          <p class="font-mono text-neonGreen mb-2 tracking-wide text-xs">
+            <i class="fa-solid fa-shield-halved mr-2"></i>
+            <span class="lang-fr">Connexion établie. Bienvenue,</span><span class="lang-en">Connection established. Welcome,</span>
+          </p>
+          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight glitch" data-text="MOHAMMED KEHAL">MOHAMMED KEHAL</h1>
+          <div class="w-20 h-1 bg-neonGreen mt-4 mb-4"></div>
+          <h2 class="text-xl md:text-3xl font-bold text-textPrimary leading-snug">
+            <i class="fa-solid fa-bolt text-neonGreen mr-2"></i>
+            <span class="lang-fr">INGÉNIEUR INFORMATIQUE & CYBERSÉCURITÉ</span>
+            <span class="lang-en">IT & CYBERSECURITY ENGINEER</span>
+          </h2>
+        </div>
+      </div>
+
+      <div class="max-w-2xl text-sm md:text-base mb-8 text-textSecondary leading-relaxed bg-cyberBlack/50 p-4 rounded border-l-2 border-neonGreen">
+        <p class="lang-fr">
+          Étudiant en Master <span class="text-neonGreen font-bold">2I2S (Ingénierie Informatique et Sécurité Systèmes)</span> spécialisé en <span class="text-textPrimary font-bold">Cybersécurité, DevOps et Systèmes Distribués</span>. Reconnu pour mon excellence en infrastructure réseau à la Huawei ICT Competition. J'architecte des solutions sécurisées et automatise des infrastructures complexes.
+        </p>
+        <p class="lang-en">
+          Master's student in <span class="text-neonGreen font-bold">2I2S (IT Engineering and Systems Security)</span> specializing in <span class="text-textPrimary font-bold">Cybersecurity, DevOps, and Distributed Systems</span>. Recognized for network infrastructure excellence at the Huawei ICT Competition. I architect secure solutions and automate complex infrastructures.
+        </p>
+
+        <div class="mt-4"><span class="font-mono text-xs md:text-sm" id="typewriter"></span><span class="cursor font-mono text-xs md:text-sm"></span></div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2 font-mono text-xs border border-neonGreen/30 p-1 rounded bg-black/50">
+            <span class="px-3 text-textSecondary">
+              <i class="fa-solid fa-file-pdf mr-2 text-neonGreen"></i>
+              <span class="lang-fr">TÉLÉCHARGER CV :</span><span class="lang-en">DOWNLOAD RESUME:</span>
+            </span>
+            <a href="CV_KEHAL_Mohammed FR.pdf" download class="px-4 py-2 bg-neonGreen/10 text-neonGreen hover:bg-neonGreen hover:text-cyberBlack transition rounded shadow-[0_0_10px_rgba(0,255,65,0.1)]">FR</a>
+            <a href="CV_KEHAL_Mohammed EN.pdf" download class="px-4 py-2 bg-neonGreen/10 text-neonGreen hover:bg-neonGreen hover:text-cyberBlack transition rounded shadow-[0_0_10px_rgba(0,255,65,0.1)]">EN</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <button onclick="showPage('page-exp')" class="px-6 py-3 border border-neonGreen bg-neonGreen/10 text-neonGreen rounded font-mono text-sm hover:bg-neonGreen hover:text-cyberBlack transition shadow-[0_0_10px_rgba(0,255,65,0.2)]">
+          <i class="fa-solid fa-magnifying-glass mr-2"></i>
+          <span class="lang-fr">EXPLORER MON PROFIL</span><span class="lang-en">EXPLORE MY PROFILE</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="px-6 md:px-24 max-w-5xl mx-auto mt-8">
+      <div class="bg-lightCard rounded-lg shadow-[0_10px_30px_rgba(0,255,65,0.05)] border border-neonGreen/20">
+        <div class="bg-[#1a1a1a] px-4 py-2 flex items-center gap-2 border-b border-neonGreen/20">
+          <div class="w-3 h-3 rounded-full bg-red-500"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500"></div>
+          <div class="text-[0.65rem] font-mono ml-4 text-textSecondary">
+            <i class="fa-solid fa-folder-tree mr-2"></i>
+            <span class="lang-fr">root@mohammed-kehal:~# cat résumé.txt</span><span class="lang-en">root@mohammed-kehal:~# cat summary.txt</span>
+          </div>
+        </div>
+        <div class="p-6 font-mono text-xs md:text-sm leading-relaxed cyber-list">
+          <ul>
+            <li>
+              <img src="huawei-logo.png" alt="Huawei" class="w-4 h-4 inline-block mr-1 align-text-bottom">
+              <span class="text-neonGreen font-bold lang-fr">2ème place nationale</span><span class="text-neonGreen font-bold lang-en">2nd Place National</span>
+              - Huawei ICT Competition <span class="lang-fr">(Track Réseau)</span><span class="lang-en">(Network Track)</span>.
+            </li>
+            <li>
+              <img src="Fsr_bg.png" alt="2I2S" class="w-4 h-4 inline-block mr-1 align-text-bottom bg-white rounded-sm" onerror="this.outerHTML='<i class=\'fa-solid fa-graduation-cap mr-1 text-neonGreen\'></i>'">
+              <span class="lang-fr">Master Ingénierie Informatique et Sécurité Systèmes (2I2S) - Rabat.</span><span class="lang-en">Master in IT Engineering and Systems Security (2I2S) - Rabat.</span>
+            </li>
+            <li>
+              <span class="lang-fr">Sécurisation d'infrastructures critiques & CI/CD (Docker, K8s).</span><span class="lang-en">Securing critical infrastructures & CI/CD pipeline building (Docker, K8s).</span>
+            </li>
+            <li class="mt-4">
+              <a href="#page-contact" onclick="showPage('page-contact')" class="text-neonGreen hover:text-white transition underline decoration-dashed">
+                <i class="fa-solid fa-satellite-dish mr-2"></i>
+                <span class="lang-fr">./me_contacter.sh</span><span class="lang-en">./contact_me.sh</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="page-exp" class="page-section">
+    <section class="px-6 md:px-24 max-w-6xl mx-auto">
+      <div class="flex items-center gap-4 mb-8">
+        <h2 class="text-2xl font-extrabold"><span class="font-mono text-neonGreen text-lg mr-3">02.</span><i class="fa-solid fa-briefcase mr-3 text-textSecondary"></i><span class="lang-fr">EXPÉRIENCE</span><span class="lang-en">EXPERIENCE</span></h2>
+        <div class="h-[1px] bg-neonGreen/20 flex-grow"></div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-trophy"></i></div>
+          <div class="flex justify-between items-start mb-4 relative z-10">
+            <div>
+              <h3 class="text-base font-bold text-white"><span class="lang-fr">Compétiteur (Track Réseau)</span><span class="lang-en">Competitor (Network Track)</span></h3>
+              <p class="font-mono text-neonGreen text-[0.65rem] mt-1"><i class="fa-solid fa-building mr-1"></i>Huawei ICT Competition</p>
+            </div>
+            <p class="text-[0.65rem] font-mono text-slate bg-neonGreen/10 px-2 py-1 rounded border border-neonGreen/30">2025 – 2026</p>
+          </div>
+          <ul class="text-[0.75rem] cyber-list relative z-10 text-textSecondary">
+            <li class="lang-fr"><strong class="text-neonGreen">2ème Place Nationale</strong> et phase Régionale au siège Huawei.</li>
+            <li class="lang-en"><strong class="text-neonGreen">2nd Place National</strong> and Regional phase at Huawei HQ.</li>
+            <li class="lang-fr">Expertise approfondie en Datacom, Sécurité et réseaux WLAN.</li>
+            <li class="lang-en">Deep expertise in Datacom, Security, and WLAN networks.</li>
+          </ul>
+        </div>
+
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="flex justify-between items-start mb-4 relative z-10">
+            <div>
+              <h3 class="text-base font-bold text-white"><span class="lang-fr">Manager Conseil Client</span><span class="lang-en">Customer Advisor Manager</span></h3>
+              <p class="font-mono text-neonGreen text-[0.65rem] mt-1"><i class="fa-solid fa-car mr-1"></i>Enterprise Rent-A-Car</p>
+            </div>
+            <p class="text-[0.65rem] font-mono text-slate bg-neonGreen/10 px-2 py-1 rounded border border-neonGreen/30"><span class="lang-fr">Août – Sept</span><span class="lang-en">Aug – Sept</span> 2025</p>
+          </div>
+          <ul class="text-[0.75rem] cyber-list relative z-10 text-textSecondary">
+            <li class="lang-fr">Supervision et formation d'équipe, gestion de flotte et C.A.</li>
+            <li class="lang-en">Team supervision and training, fleet and revenue management.</li>
+            <li class="lang-fr">Résolution de situations critiques et optimisation de la satisfaction.</li>
+            <li class="lang-en">Resolving critical situations and optimizing overall satisfaction.</li>
+          </ul>
+        </div>
+
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-code"></i></div>
+          <div class="flex justify-between items-start mb-4 relative z-10">
+            <div>
+              <h3 class="text-base font-bold text-white"><span class="lang-fr">Stagiaire IT</span><span class="lang-en">IT Intern</span></h3>
+              <p class="font-mono text-neonGreen text-[0.65rem] mt-1"><i class="fa-solid fa-building-shield mr-1"></i>AMSSNUR</p>
+            </div>
+            <p class="text-[0.65rem] font-mono text-slate bg-neonGreen/10 px-2 py-1 rounded border border-neonGreen/30"><span class="lang-fr">Juil</span><span class="lang-en">Jul</span> 2024</p>
+          </div>
+          <ul class="text-[0.75rem] cyber-list relative z-10 text-textSecondary">
+            <li class="lang-fr">Amélioration d'une plateforme web interne de revue de presse.</li>
+            <li class="lang-en">Improvement of an internal web press review platform.</li>
+            <li class="lang-fr">Développement et intégration d'éléments graphiques fonctionnels.</li>
+            <li class="lang-en">Development and integration of functional graphic elements.</li>
+          </ul>
+        </div>
+
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-handshake"></i></div>
+          <div class="flex justify-between items-start mb-4 relative z-10">
+            <div>
+              <h3 class="text-base font-bold text-white"><span class="lang-fr">Agent Commercial BtoB</span><span class="lang-en">B2B Sales Agent</span></h3>
+              <p class="font-mono text-neonGreen text-[0.65rem] mt-1"><i class="fa-solid fa-headset mr-1"></i>ADM Value</p>
+            </div>
+            <p class="text-[0.65rem] font-mono text-slate bg-neonGreen/10 px-2 py-1 rounded border border-neonGreen/30"><span class="lang-fr">Juil – Sept</span><span class="lang-en">Jul – Sep</span> 2023</p>
+          </div>
+          <ul class="text-[0.75rem] cyber-list relative z-10 text-textSecondary">
+            <li class="lang-fr">Prospection, négociation et relation client (environnement francophone).</li>
+            <li class="lang-en">Prospecting, negotiation, and customer relations (French-speaking environment).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="page-projects" class="page-section">
+    <section class="px-6 md:px-24 max-w-6xl mx-auto">
+      <div class="flex items-center gap-4 mb-8">
+        <h2 class="text-2xl font-extrabold"><span class="font-mono text-neonGreen text-lg mr-3">03.</span><i class="fa-solid fa-network-wired mr-3 text-textSecondary"></i><span class="lang-fr">RÉALISATIONS</span><span class="lang-en">PROJECTS</span></h2>
+        <div class="h-[1px] bg-neonGreen/20 flex-grow"></div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 pb-16 relative">
+          <div class="flex justify-between items-center mb-4">
+            <i class="fa-solid fa-server text-3xl text-neonGreen"></i>
+            <a href="#" class="hover:text-white transition text-lg text-neonGreen"><i class="fa-brands fa-github"></i></a>
+          </div>
+          <h3 class="text-sm md:text-base font-bold mb-2"><span class="lang-fr">Trafic Urbain Intelligent Distribué</span><span class="lang-en">Distributed Smart Urban Traffic</span></h3>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-fr">Plateforme événementielle pour congestion urbaine en temps réel (Apache Kafka, JAX-WS, RMI). Dashboard React/WebSockets.</p>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-en">Event-driven platform for real-time urban congestion (Apache Kafka, JAX-WS, RMI). React/WebSockets live dashboard.</p>
+          <div class="absolute bottom-4 left-6 right-6">
+            <div class="h-[1px] bg-neonGreen/20 mb-2"></div>
+            <ul class="flex gap-2 text-neonGreen flex-wrap font-mono text-[0.6rem]">
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Java</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Kafka</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">React</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 pb-16 relative">
+          <div class="flex justify-between items-center mb-4">
+            <i class="fa-solid fa-city text-3xl text-neonGreen"></i>
+            <a href="#" class="hover:text-white transition text-lg text-neonGreen"><i class="fa-brands fa-github"></i></a>
+          </div>
+          <h3 class="text-sm md:text-base font-bold mb-2">Plateforme IoT Smart City</h3>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-fr">Optimisation de l'éclairage public (Python, FastAPI, MQTT). Modèle IA Scikit-Learn de maintenance prédictive électrique.</p>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-en">Public lighting energy optimization (Python, FastAPI, MQTT). Scikit-Learn AI model for electrical predictive maintenance.</p>
+          <div class="absolute bottom-4 left-6 right-6">
+            <div class="h-[1px] bg-neonGreen/20 mb-2"></div>
+            <ul class="flex gap-2 text-neonGreen flex-wrap font-mono text-[0.6rem]">
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Python</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">MQTT</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Machine Learning</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 pb-16 relative">
+          <div class="flex justify-between items-center mb-4">
+            <i class="fa-brands fa-docker text-3xl text-neonGreen"></i>
+            <a href="#" class="hover:text-white transition text-lg text-neonGreen"><i class="fa-brands fa-github"></i></a>
+          </div>
+          <h3 class="text-sm md:text-base font-bold mb-2"><span class="lang-fr">CI/CD & Microservices Conteneurisés</span><span class="lang-en">Containerized CI/CD & Microservices</span></h3>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-fr">Gestion de tâches 3-tiers industrialisée. Conteneurisation complète, pipeline CI/CD automatisé et déploiement Kubernetes.</p>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-en">Industrialized 3-tier task management app. Full containerization, automated CI/CD pipeline, and Kubernetes orchestration.</p>
+          <div class="absolute bottom-4 left-6 right-6">
+            <div class="h-[1px] bg-neonGreen/20 mb-2"></div>
+            <ul class="flex gap-2 text-neonGreen flex-wrap font-mono text-[0.6rem]">
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Docker/K8s</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">CI/CD</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Spring Boot</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cyber-card bg-lightCard p-6 rounded border border-neonGreen/20 pb-16 relative">
+          <div class="flex justify-between items-center mb-4">
+            <i class="fa-solid fa-chart-line text-3xl text-neonGreen"></i>
+            <a href="#" class="hover:text-white transition text-lg text-neonGreen"><i class="fa-brands fa-github"></i></a>
+          </div>
+          <h3 class="text-sm md:text-base font-bold mb-2"><span class="lang-fr">Prédicteur Boursier NASDAQ (PFE)</span><span class="lang-en">NASDAQ Stock Predictor (Capstone)</span></h3>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-fr">Modèle de machine learning prédisant les tendances du marché NASDAQ à partir de données financières historiques réelles.</p>
+          <p class="text-[0.75rem] mb-4 text-textSecondary lang-en">Machine learning model predicting NASDAQ market trends based on real-world historical financial data.</p>
+          <div class="absolute bottom-4 left-6 right-6">
+            <div class="h-[1px] bg-neonGreen/20 mb-2"></div>
+            <ul class="flex gap-2 text-neonGreen flex-wrap font-mono text-[0.6rem]">
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Python</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Scikit-Learn</li>
+              <li class="bg-neonGreen/10 px-2 py-0.5 rounded">Data Science</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="page-skills" class="page-section">
+    <section class="px-6 md:px-24 max-w-6xl mx-auto">
+      <div class="flex items-center gap-4 mb-8">
+        <h2 class="text-2xl font-extrabold"><span class="font-mono text-neonGreen text-lg mr-3">04.</span><i class="fa-solid fa-microchip mr-3 text-textSecondary"></i><span class="lang-fr">COMPÉTENCES</span><span class="lang-en">SKILLS</span></h2>
+        <div class="h-[1px] bg-neonGreen/20 flex-grow"></div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <div class="bg-lightCard border border-neonGreen/20 p-6 rounded mb-6 cyber-card">
+            <h3 class="font-mono text-neonGreen mb-4 text-sm border-b border-neonGreen/20 pb-2"><i class="fa-solid fa-laptop-code mr-2"></i><span class="lang-fr">DÉVELOPPEMENT & DEVOPS</span><span class="lang-en">DEVELOPMENT & DEVOPS</span></h3>
+            <div class="flex flex-wrap gap-2 font-mono text-[0.7rem] text-textSecondary">
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Java (17, Spring Boot, RMI)</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Python (FastAPI, ML)</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Docker / Kubernetes</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">GitHub Actions (CI/CD)</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">MySQL / SQLite</span>
+            </div>
+          </div>
+
+          <div class="bg-lightCard border border-neonGreen/20 p-6 rounded cyber-card">
+            <h3 class="font-mono text-neonGreen mb-4 text-sm border-b border-neonGreen/20 pb-2"><i class="fa-solid fa-shield-cat mr-2"></i><span class="lang-fr">RÉSEAUX & CYBERSÉCURITÉ</span><span class="lang-en">NETWORKING & CYBERSECURITY</span></h3>
+            <div class="flex flex-wrap gap-2 font-mono text-[0.7rem] text-textSecondary">
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Datacom / WLAN</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Sécurité Réseaux</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">IPv4/IPv6 / STP</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Apache Kafka</span>
+              <span class="bg-cyberBlack border border-neonGreen/30 px-2 py-1 rounded">Scikit-Learn (IA Détection)</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="bg-lightCard border border-neonGreen/20 p-6 rounded mb-6 cyber-card">
+            <h3 class="font-mono text-neonGreen mb-4 text-sm border-b border-neonGreen/20 pb-2"><i class="fa-solid fa-graduation-cap mr-2"></i><span class="lang-fr">FORMATION</span><span class="lang-en">EDUCATION</span></h3>
+            <ul class="space-y-3 font-mono text-[0.7rem] text-textSecondary">
+              <li><i class="fa-solid fa-angle-right text-neonGreen mr-2"></i>Master 2I2S – <span class="lang-fr">Faculté des Sciences</span><span class="lang-en">Faculty of Sciences</span> <span class="text-neonGreen ml-1">[2025–<span class="lang-fr">Présent</span><span class="lang-en">Present</span>]</span></li>
+              <li><i class="fa-solid fa-angle-right text-neonGreen mr-2"></i><span class="lang-fr">Licence SMI</span><span class="lang-en">Bachelor SMI</span> – <span class="lang-fr">Faculté des Sciences</span><span class="lang-en">Faculty of Sciences</span> <span class="text-neonGreen ml-1">[2024–2025]</span></li>
+              <li><i class="fa-solid fa-angle-right text-neonGreen mr-2"></i><span class="lang-fr">Bac Sciences Physiques</span><span class="lang-en">High School Diploma (Physics)</span> – Louis Le Grand <span class="text-neonGreen ml-1">[2022]</span></li>
+            </ul>
+          </div>
+
+          <div class="bg-lightCard border border-neonGreen/20 p-6 rounded cyber-card">
+            <h3 class="font-mono text-neonGreen mb-4 text-sm border-b border-neonGreen/20 pb-2"><i class="fa-solid fa-earth-africa mr-2"></i><span class="lang-fr">LANGUES</span><span class="lang-en">LANGUAGES</span></h3>
+            <ul class="space-y-2 font-mono text-[0.7rem] text-textSecondary">
+              <li><i class="fa-regular fa-comments text-neonGreen mr-2"></i><span class="lang-fr">Arabe : Maternelle</span><span class="lang-en">Arabic: Native</span></li>
+              <li><i class="fa-regular fa-comments text-neonGreen mr-2"></i><span class="lang-fr">Français : Bilingue / Courant</span><span class="lang-en">French: Fluent / Bilingual</span></li>
+              <li><i class="fa-regular fa-comments text-neonGreen mr-2"></i><span class="lang-fr">Anglais : Niveau professionnel</span><span class="lang-en">English: Professional working proficiency</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="page-contact" class="page-section">
+    <section class="py-16 px-6 text-center max-w-2xl mx-auto">
+      <div class="inline-block p-4 rounded-full bg-neonGreen/10 text-neonGreen text-4xl mb-6 shadow-[0_0_20px_rgba(0,255,65,0.2)]">
+        <i class="fa-solid fa-satellite-dish animate-pulse"></i>
+      </div>
+      <h2 class="text-3xl font-extrabold mb-6"><span class="lang-fr">ÉTABLIR UNE CONNEXION</span><span class="lang-en">ESTABLISH CONNECTION</span></h2>
+      <p class="mb-10 text-sm text-textSecondary lang-fr">Je suis activement à la recherche d'un stage pratique (Août - Septembre 2026) en cybersécurité, réseaux ou DevOps pour appliquer mon expertise technique. Transmission sécurisée ouverte.</p>
+      <p class="mb-10 text-sm text-textSecondary lang-en">I am actively seeking a practical internship (August - September 2026) in cybersecurity, networking, or DevOps to apply my technical expertise. Secure transmission open.</p>
+
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mohammed.kehal@um5r.ac.ma" target="_blank" class="inline-flex items-center gap-3 px-8 py-4 border border-neonGreen bg-neonGreen/5 text-neonGreen rounded font-mono text-sm hover:bg-neonGreen hover:text-cyberBlack transition shadow-[0_0_15px_rgba(0,255,65,0.2)]">
+        <i class="fa-solid fa-envelope-open-text"></i> <span class="lang-fr">ENVOYER UN E-MAIL</span><span class="lang-en">SEND AN E-MAIL</span>
+      </a>
+
+      <div class="mt-16 flex justify-center gap-8 text-2xl">
+        <a href="https://www.linkedin.com/in/mohammed-kehal-30a371355/" target="_blank" class="text-textSecondary hover:text-neonGreen transition transform hover:-translate-y-1"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="#" target="_blank" class="text-textSecondary hover:text-neonGreen transition transform hover:-translate-y-1"><i class="fa-brands fa-github"></i></a>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mohammed.kehal@um5r.ac.ma" target="_blank" class="text-textSecondary hover:text-neonGreen transition transform hover:-translate-y-1"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<script>
+  // --- BILINGUISME ---
+  function toggleLanguage() {
+    const htmlTag = document.documentElement;
+    const currentLang = htmlTag.getAttribute('lang');
+    const newLang = currentLang === 'fr' ? 'en' : 'fr';
+    htmlTag.setAttribute('lang', newLang);
+    restartTypewriter();
+  }
+
+  // --- NAVIGATION DYNAMIQUE (SPA) ---
+  function showPage(pageId) {
+    document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // --- EFFET MACHINE À ÉCRIRE (Mise à jour pour bilinguisme) ---
+  const twElement = document.getElementById("typewriter");
+  let twTimeout;
+  let twIndex = 0;
+
+  function typeWriter(text) {
+    if (twIndex < text.length) {
+      twElement.innerHTML += text.charAt(twIndex);
+      twIndex++;
+      twTimeout = setTimeout(() => typeWriter(text), 40);
+    }
+  }
+
+  function restartTypewriter() {
+    clearTimeout(twTimeout);
+    twElement.innerHTML = "";
+    twIndex = 0;
+    const isEn = document.documentElement.getAttribute('lang') === 'en';
+    const text = isEn ? ">_ Status: Seeking internship (Aug - Sept 2026)" : ">_ Status : Recherche de stage (Août - Sept 2026)";
+    setTimeout(() => typeWriter(text), 500);
+  }
+
+  // Lancer au démarrage
+  restartTypewriter();
+
+  // --- EFFET MATRIX DIGITAL RAIN (En arrière plan) ---
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=<>?'.split('');
+  const fontSize = 12;
+  const columns = canvas.width / fontSize;
+  const drops = [];
+  for (let x = 0; x < columns; x++) drops[x] = 1;
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00FF41';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(drawMatrix, 50);
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+</body>
+</html>
